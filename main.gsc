@@ -173,3 +173,9 @@ PapCurrentWeapon()
         self GiveAATWeapon(SaveAAt, self, true);
     }
 }
+GiveAATWeapon(AAT, self, string)
+{
+    current_weapon = self getCurrentWeapon();
+    current_weapon = self zm_weapons::switch_from_alt_weapon(current_weapon);
+    self AAT::acquire(current_weapon, (isDefined(string) ? AAT : level._WeaponAAT[AAT]));
+}
