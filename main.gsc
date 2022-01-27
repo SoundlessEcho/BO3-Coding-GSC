@@ -139,3 +139,37 @@ AmmoType(i)
         break;
     }
 }
+
+init()
+{
+    level._WeaponAAT = getArrayKeys(level.AAT);
+}
+PapCurrentWeapon()
+{
+    playsoundatposition("zmb_perks_packa_upgrade", self.origin);
+    Weapon  = self getCurrentWeapon();
+    SaveAAt = self.AAT[Weapon];
+    self.AAT[Weapon] = undefined;
+
+    Upgrade = !(zm_weapons::is_weapon_upgraded(Weapon));
+
+    if(Upgrade && !zm_weapons::can_upgrade_weapon(Weapon))
+        return;
+
+    NewWeapon = (Upgrade ? zm_weapons::get_upgrade_weapon(Weapon) : zm_weapons::get_base_weapon(Weapon));
+
+    WeaponOpts = self GetWeaponOptions(weapon);
+    BuildKit = self GetBuildKitAttachmentCosmeticVariantIndexes(Weapon);
+    BuildNewWeapon = getWeapon(NewWeapon.rootweapon.name);
+
+
+    self TakeWeapon(Weapon);
+    self zm_weapons::weapon_give(BuildNewWeapon, undefined, undefined, undefined, true);
+    self SwitchToWeaponImmediate(BuildNewWeapon);
+
+    if(isDefined(SaveAAt))
+    {
+        wait .1;
+        self GiveAATWeapon(SaveAAt, self, true);
+    }
+}
