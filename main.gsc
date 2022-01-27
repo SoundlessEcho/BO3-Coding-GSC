@@ -66,6 +66,66 @@
 #include scripts\shared\audio_shared;
 #include scripts\shared\gameobjects_shared;
 
+CYCL( text, hud, colour )
+{
+    self endon("stop_CYCL");
+    while(isDefined(hud))
+    {
+        old = colour;
+        while(colour == old)
+            colour = "^" + randomIntRange(1,7);
+        for(e=0;e<text.size;e++)
+        {    
+            string = colour + "";
+            for(x=0;x<text.size;x++)
+            {
+                if( e == x )    
+                    string += text[x] + old;
+                else 
+                    string += text[x];    
+            }
+            hud setSafeText( string );
+            wait .1;
+        }
+    }
+}
+KRDR( text, hud, colour )
+{
+    self endon("stop_KRDR");
+    dir = 1;
+    while(isDefined(hud))
+    {
+        dir = dir ? 0 : 1;
+        for(e=0;e<text.size;e++)
+        {
+            if(!isDefined(colour))
+                colour = "^" + randomIntRange(1,7);
+            string = "";
+            for(x=0;x<text.size;x++)
+            {
+                if( dir == 1 && e == x || dir == 0 && ((text.size - 1) - e) == x )
+                    string += colour + text[x] + "^7";
+                else 
+                    string += text[x];
+            }
+            hud setText( string );
+            wait .1;
+        }
+    }    
+}
+RAIN( text, hud )
+{
+    self endon("stop_RAIN");
+    while(isDefined(hud))
+    {
+        string = "";
+        for(e=0;e<text.size;e++)
+            string += "^" + randomIntRange(0,7) + text[e];    
+        hud setSafeText( string );    
+        wait .1;
+    }
+}
+
 AmmoType(i)
 {
     switch(i)
