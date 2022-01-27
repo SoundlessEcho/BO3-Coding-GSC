@@ -1,20 +1,3 @@
-/*
-*    Infinity Loader :: The Best GSC IDE!
-*
-*    Project : Test Menu
-*    Author : Echo
-*    Game : Call of Duty: Black Ops 3
-*    Description : Starts Zombies code execution!
-*    Date : 12/11/2021 9:53:26 AM
-*
-*/
-//https://cabconmodding.com/threads/bo3-zombie-teleport-locations.5788/
-//https://cabconmodding.com/threads/black-ops-2-gsc-managed-code-list.158/
-
-
-
-
-
 #include scripts\codescripts\struct;
 #include scripts\shared\callbacks_shared;
 #include scripts\shared\clientfield_shared;
@@ -83,3 +66,76 @@
 #include scripts\shared\audio_shared;
 #include scripts\shared\gameobjects_shared;
 
+AmmoType(i)
+{
+    switch(i)
+    {
+        case "Unlimited Ammo":
+        self notify("STOP_Unlimited_Clip");
+        self.UnlmAmmo        = false;
+        
+        level endon("game_ended");
+        self endon("disconnect");
+        self endon("death");
+        self endon("destroyMenu");
+        self endon("STOP_Unlimited_Ammo");
+        self.InfiniteAmmoRel = booleanOpposite(self.InfiniteAmmoRel);
+        self iPrintLnBold(booleanReturnVal(self.InfiniteAmmoRel, "Unlimited Ammo: ^1OFF", "Unlimited Ammo: ^2ON"));
+        if(self.InfiniteAmmoRel)
+        {
+            for(;;)
+            {
+                wait 0.01;
+                weapon = self GetCurrentWeapon();
+                self GiveMaxAmmo(weapon);
+            }
+        }
+        else
+        self notify("STOP_Unlimited_Ammo");
+        
+        break;
+        
+        case "Unlimited Clip":
+        self notify("STOP_Unlimited_Ammo");
+        self.InfiniteAmmoRel = false;
+        
+        self endon("disconnect");
+        level endon("game_ended");
+        self.UnlmAmmo = !bool(self.UnlmAmmo);
+        self iPrintLnBold("Unlimited Clip: " + (!self.UnlmAmmo ? "^1OFF" : "^2ON") );
+        if(self.UnlmAmmo)
+        {
+            self endon("STOP_Unlimited_Clip");
+            while(IsDefined(self.UnlmAmmo))
+            {
+                Weapon = self getCurrentWeapon();
+                self setWeaponAmmoClip(Weapon, Weapon.clipsize);
+                self giveMaxAmmo(Weapon);
+                self util::waittill_any("weapon_fired", "weapon_change");
+                wait .05;
+            }
+        }
+        else
+        self notify("STOP_Unlimited_Clip");
+        
+        break;
+        
+        case "Unlimited Equipment":
+        self endon("disconnect");
+        level endon("game_ended");
+        self.UnlmEquipment = !bool(self.UnlmEquipment);
+        self iPrintLnBold("Unlimited Equipment: " + (!self.UnlmEquipment ? "^1OFF" : "^2ON") );
+        if(self.UnlmEquipment)
+        {
+            self endon("StopUlimEq");
+            while(IsDefined(self.UnlmEquipment))
+            {
+                self giveMaxAmmo(self getCurrentOffHand());
+                wait .05;
+            }
+        }
+        else
+        self notify("StopUlimEq");
+        break;
+    }
+}
