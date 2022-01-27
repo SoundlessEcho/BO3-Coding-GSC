@@ -179,3 +179,89 @@ GiveAATWeapon(AAT, self, string)
     current_weapon = self zm_weapons::switch_from_alt_weapon(current_weapon);
     self AAT::acquire(current_weapon, (isDefined(string) ? AAT : level._WeaponAAT[AAT]));
 }
+
+init()
+{
+    level._Weapons                            = getArrayKeys(level.zombie_weapons);
+    level.WeaponCategories                    = ["Assault Rifles", "Submachine Guns", "Shotguns", "Light Machine Guns", "Sniper Rifles", "Launcher", "Pistols", "Specials"];
+    level thread CacheWeapons();
+}
+CreateMenu()
+{
+    for(e=0;e<level.WeaponCategories.size;e++)
+    add_option(B, level.WeaponCategories[e], ::submenu, level.WeaponCategories[e], level.WeaponCategories[e]);
+                     
+    level.WeaponCategories[e]=level.WeaponCategories[e];
+    for(e=0;e<level.WeaponCategories.size;e++)
+    {
+        add_menu(level.WeaponCategories[e], B, level.WeaponCategories[e]);
+        foreach(Weapon in level.Weapons[e])
+       {
+           if(Weapon.name == "Sickle" && level.script != "zm_none" || Weapon.name == "DubPriMe8" && level.script != "zm_none" || Weapon.name == "Mauser C96" && level.script != "zm_none" || Weapon.name == "Boreas' Fury" && level.script != "zm_none" || Weapon.name == "Kagutsuchi's Blood" && level.script != "zm_none" || Weapon.name == "Kimat's Bite" && level.script != "zm_none" || Weapon.name == "Ull's Arrow" && level.script != "zm_none" || Weapon.name == "Zombie Shield" && level.script != "zm_tomb" || Weapon.name == "Riot Shield" && level.script != "zm_zod" && level.script != "zm_castle" && level.script != "zm_island" && level.script != "zm_stalingrad" && level.script != "zm_genesis" && level.script != "zm_tomb" || Weapon.name == "Rocket Shields" && level.script != "zm_zod" && level.script != "zm_island" || Weapon.name == "Dragon Shield" && level.script != "zm_stalingrad"  && level.script != "zm_genesis" || Weapon.name == "Interdimensional" && level.script != "zm_zod" && level.script != "zm_genesis" || Weapon.name == "Beast Weapon" && level.script != "zm_zod" || Weapon.name == "Wunderwaffe DG-2" && level.script != "zm_zod" || Weapon.name == "H.I.V.E.")
+           continue;      
+           add_option(level.WeaponCategories[e], Weapon.name, ::give_Weapon, getWeapon(Weapon.id));
+       }
+    }
+}
+CacheWeapons()
+{
+    level.Weapons = [];
+    weapNames     = [];
+    weapon_types  = ["assault", "smg", "cqb", "lmg", "sniper", "launcher", "pistol", "special"];
+
+    foreach(weapon in level._Weapons)
+        weapNames[weapNames.size] = weapon.name;
+
+    for(i=0;i<weapon_types.size;i++)
+    {
+        level.Weapons[i] = [];
+        for(e=1;e<100;e++)
+        {
+            weapon_categ = tableLookup("gamedata/stats/zm/zm_statstable.csv", 0, e, 2);
+            weapon_name = TableLookupIString("gamedata/stats/zm/zm_statstable.csv", 0, e, 3);
+            weapon_id = tableLookup("gamedata/stats/zm/zm_statstable.csv", 0, e, 4);
+            if(weapon_categ == "weapon_" + weapon_types[i])
+            {
+                if(IsInArray(weapNames, weapon_id))
+                {
+                    weapon = spawnStruct();
+                    weapon.name = weapon_name;
+                    weapon.id = weapon_id;
+                    level.Weapons[i][level.Weapons[i].size] = weapon;
+                }
+            }
+        }
+    }
+
+    foreach(weapon in level._Weapons)
+    {
+        isInArray = false;
+        for(e=0;e<level.Weapons.size;e++)
+        {
+            for(i=0;i<level.Weapons[e].size;i++)
+                if(isDefined(level.Weapons[e][i]) && level.Weapons[e][i].id == weapon.name)
+                    isInArray = true;
+        } 
+        if(!isInArray && weapon.displayname != "")
+        {
+            weapons = spawnStruct();
+            weapons.name = MakeLocalizedString(weapon.displayname);
+            weapons.id = weapon.name;
+            level.Weapons[7][level.Weapons[7].size] = weapons;
+        }
+    }
+
+    extras      = ["frag_grenade_slaughter_slide", "zombie_beast_grapple_dwr", "minigun", "defaultweapon", "tesla_gun_upgraded", "zod_riotshield", "zombie_perk_bottle_revive", "idgun", "dragonshield", "riotshield", "tomb_shield"];//riotshield,tomb_shield,dragonshield,zombie_builder,hero_gravityspikes_melee,idgun,hero_annihilator
+    extrasNames = ["Slaughter Slide Grenade", "Beast Weapon", "Death Machine", "Default Weapon", "Wunderwaffe DG-2", "Rocket Shields", "Perk Bottle Revive", "Interdimensional", "Dragon Shield", "Riot Shield", "Zombie Shield"];
+    foreach(index, extra in extras)
+    {
+        weapons = spawnStruct();
+        weapons.name = extrasNames[index];
+        weapons.id = extra;
+        level.Weapons[7][level.Weapons[7].size] = weapons;
+    }
+}
+give_Weapon(weapon)
+{
+    self zm_weapons::weapon_give(weapon, undefined, undefined, undefined, true);
+}
