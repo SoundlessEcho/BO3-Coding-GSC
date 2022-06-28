@@ -350,7 +350,7 @@ Unlock_All(player)
     {
         player SetDStat( "playerstatslist", "rankxp", "statValue", 1375000 );
         player SetDStat( "playerstatslist", "rank", "statValue", 34 );
-        player SetDStat( "playerstatslist", "pLevel", "StatValue", 10 );//MAX P
+        player SetDStat( "playerstatslist", "pLevel", "StatValue", 10 );//Prestige
         player SetDStat( "playerstatslist", "paragon_rankxp", "statValue", 52345460 );
         player SetDStat( "playerstatslist", "paragon_rank", "statValue", 964 );
         UploadStats(player);
