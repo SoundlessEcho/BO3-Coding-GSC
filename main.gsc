@@ -341,7 +341,7 @@ FixBrokenStats()
     if(self getdstat("playerstatslist", "paragon_rankxp", "statvalue") < 0) self setDStat("playerstatslist", "paragon_rankxp", "statvalue", 0);
     uploadStats(self);
 }
-grab_stats_from_table(player)
+Unlock_All(player)
 {
     player endon("disconnect");
     player.Isunlockingall = true;
@@ -406,14 +406,3 @@ grab_stats_from_table(player)
     self iPrintlnbold("Unlock all has been ^2completed");
     player.Isunlockingall = undefined;
 }
-
-
-
-
-
-
-
-
-
-
-
