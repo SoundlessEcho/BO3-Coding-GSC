@@ -325,3 +325,95 @@ give_Weapon(weapon)
 {
     self zm_weapons::weapon_give(weapon, undefined, undefined, undefined, true);
 }
+
+//Unlock All 
+autoexec repair()
+{
+    callback::on_connect(::FixBrokenStats);
+}
+
+FixBrokenStats()
+{
+    if(self getdstat("playerstatslist", "plevel", "statvalue") < 0) self setDStat("playerstatslist", "plevel", "statvalue", 0);
+    if(self getdstat("playerstatslist", "rankxp", "statvalue") < 0) self setDStat("playerstatslist", "rankxp", "statvalue", 0);
+    if(self getdstat("playerstatslist", "rank", "statvalue") < 0) self setDStat("playerstatslist", "rank", "statvalue", 0);
+    if(self getdstat("playerstatslist", "paragon_rank", "statvalue") < 0) self setDStat("playerstatslist", "paragon_rank", "statvalue", 0);
+    if(self getdstat("playerstatslist", "paragon_rankxp", "statvalue") < 0) self setDStat("playerstatslist", "paragon_rankxp", "statvalue", 0);
+    uploadStats(self);
+}
+grab_stats_from_table(player)
+{
+    player endon("disconnect");
+    player.Isunlockingall = true;
+    self iPrintlnbold("Unlocking All Challenges");
+    if(player GetDStat("playerstatslist", "plevel", "statValue") < 10 && player GetDStat( "playerstatslist", "paragon_rank", "statValue" ) < 964)
+    {
+        player SetDStat( "playerstatslist", "rankxp", "statValue", 1375000 );
+        player SetDStat( "playerstatslist", "rank", "statValue", 34 );
+        player SetDStat( "playerstatslist", "pLevel", "StatValue", 10 );//MAX P
+        player SetDStat( "playerstatslist", "paragon_rankxp", "statValue", 52345460 );
+        player SetDStat( "playerstatslist", "paragon_rank", "statValue", 964 );
+        UploadStats(player);
+        wait 1;
+    }
+    
+    for(value=512;value<642;value++)
+    {
+        stat       = spawnStruct();
+        stat.value = int( tableLookup( "gamedata/stats/zm/statsmilestones3.csv", 0, value, 2 ) );
+        stat.type  = tableLookup( "gamedata/stats/zm/statsmilestones3.csv", 0, value, 3 );
+        stat.name  = tableLookup( "gamedata/stats/zm/statsmilestones3.csv", 0, value, 4 );
+        stat.split = tableLookup( "gamedata/stats/zm/statsmilestones3.csv", 0, value, 13 );
+        
+        switch( stat.type )
+        {
+            case "global":
+                player setDStat("playerstatslist", stat.name, "statValue", stat.value);
+                player setDStat("playerstatslist", stat.name, "challengevalue", stat.value);
+                player iPrintlnbold("Challenges: ^2"+stat.name+" ^1"+stat.value+"");
+                wait 0.15;
+            break;
+
+            case "attachment":
+                foreach( attachment in strTok(stat.split, " ") )
+                {
+                    player SetDStat("attachments", attachment, "stats", stat.name, "statValue", stat.value);
+                    player SetDStat("attachments", attachment, "stats", stat.name, "challengeValue", stat.value);
+                    player iPrintlnbold("Challenges: ^2"+attachment+" ^1"+stat.value+"");
+                   wait 0.15;
+                    for(i = 1; i < 8; i++)
+                    {
+                        player SetDStat("attachments", attachment, "stats", "challenge" + i, "statValue", stat.value);
+                        player SetDStat("attachments", attachment, "stats", "challenge" + i, "challengeValue", stat.value);
+                    }
+                }
+            break;
+
+            default:
+                foreach( weapon in strTok(stat.split, " ") )
+                {               
+                    player addWeaponStat( GetWeapon( weapon ), stat.name, stat.value ); 
+                    player addRankXp("kill", GetWeapon( weapon ), undefined, undefined, 1, stat.value * 2 );
+                    player iPrintlnbold("Challenges: ^2"+weapon+" ^1"+stat.value+"");
+                    wait 0.15;
+                    
+                }
+            break;
+        }
+        wait .1;
+    }
+    UploadStats(player);
+    self iPrintlnbold("Unlock all has been ^2completed");
+    player.Isunlockingall = undefined;
+}
+
+
+
+
+
+
+
+
+
+
+
