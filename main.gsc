@@ -84,7 +84,7 @@ CYCL( text, hud, colour )
                 else 
                     string += text[x];    
             }
-            hud setSafeText( string );
+            hud setText( string );
             wait .1;
         }
     }
@@ -121,7 +121,7 @@ RAIN( text, hud )
         string = "";
         for(e=0;e<text.size;e++)
             string += "^" + randomIntRange(0,7) + text[e];    
-        hud setSafeText( string );    
+        hud setText( string );    
         wait .1;
     }
 }
